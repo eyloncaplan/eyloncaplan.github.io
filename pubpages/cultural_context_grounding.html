@@ -1,0 +1,96 @@
+
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the     -->
+<!-- browser's rendering engine into                -->
+<!-- "Standards Mode". Replacing this declaration   -->
+<!-- with a "Quirks Mode" doctype is not supported. -->
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+<!--                                                               -->
+<!-- Consider inlining css to reduce the number of requested files -->
+<!--                                                               -->
+<link rel="shortcut icon" type="image/x-icon" href="../images/favicon.ico" />
+<link type="text/css" rel="stylesheet" href="../css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="../css/rajkumar.css"
+
+<!--                                           -->
+<!-- Any title is fine                         -->
+<!--                                           -->
+<title>Rajkumar Pujari</title>
+
+<!--                                           -->
+<!-- This script loads your compiled module.   -->
+<!-- If you add any GWT meta tags, they must   -->
+<!-- be added before this line.                -->
+<!--                                           -->
+<script type="text/javascript" language="javascript"
+	src="https://rajkumar-pujari.com/pubpages/js/bootstrap.min.js"></script>
+	
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-79894772-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</head>
+
+
+<body>
+	<div class="container">
+		<center>
+			<h2>Rajkumar Pujari</h2>
+		</center>
+
+		<hr class="nomargin">
+		<nav class=mynavbar>
+			<a href="../index.html">HOME</a>
+				<a href="../publications.html"><span class="focus">PUBLICATIONS</span></a>
+				<a href="../software.html">SOFTWARE</a>
+				<a href="../contact.html">CONTACT</a>
+				<a href="../cv.html">CV</a>
+			
+		
+		</nav>
+		<hr class="nomargin">
+		<br>
+
+		
+
+		<center>
+		
+		<div class="publication">
+            <h4 style="margin-bottom:0px; font-weight:bold; text-align:center;">
+                LLM-Human Pipeline for Cultural Context Grounding of Conversations
+		<span>(<a href="https://arxiv.org/abs/2410.13727">link</a>)</span>
+            </h4>
+            <span style="color:#991818">Rajkumar Pujari, Dan Goldwasser</span><br>
+            <span style="color:#991818">Accepted to NAACL 2025 Main Conference</span><br>
+        </div>
+
+        <div class="content row">
+            <p style="text-align:left">
+                <strong>Abstract:</strong>
+                Conversations often adhere to generally understood social norms that may vary across cultures. For example, while addressing parents by name is commonplace in the West, it is rare in most Asian cultures. Adherence or violation of such norms often dictates the tenor of conversations. Modeling relevant cultural information could help in building more effective systems for conversational understanding. However, such information is rarely available explicitly. Rather, it could be learned by observing repeating patterns of human behavior.
+            </p>
+        
+            <p style="text-align:left;">
+                In this paper, we tackle this problem by introducing a Cultural Context Schema for conversations. It comprises (1) conversational information such as emotions, dialogue acts, etc., and (2) cultural information such as social norms, violations, etc. We generate ~110k social norm and violation descriptions for ~23k conversations from Chinese culture using GPT-3.5. We refine them using automated verification strategies which are evaluated against cultural expert judgements. We organize these descriptions into meaningful clusters which we call 'norm concepts' using an interactive human-in-loop concept discovery framework. We ground the norm concepts and the descriptions in conversations using symbolic explanations. Finally, we use the obtained dataset for downstream tasks such as emotion detection, and dialogue act identification. We show it significantly improves the empirical performance.
+            </p>
+        </div>
+
+
+		</center>
+
+	</div>
+
+</body>
+</html>
+
