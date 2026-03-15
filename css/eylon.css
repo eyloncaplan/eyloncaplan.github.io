@@ -7,10 +7,8 @@ body{
 
 .content{
 	width:80%;
-	margin:auto;
-	
+	margin-left: 5%;
 }
-
 a {
 	color:#991818;
 }
@@ -54,6 +52,18 @@ a:hover{
 }
 
 
+.news {
+	padding-left: 15px;
+}
+
 .year{
 	color:#D5B282;
 }
+
+
+@media (min-width: 992px) {
+    .news-container {
+        width: calc(66.666667% + 423px);
+    }
+}
+
