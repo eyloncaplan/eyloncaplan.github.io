@@ -32,6 +32,25 @@
   ga('create', 'UA-79894772-1', 'auto');
   ga('send', 'pageview');
 </script>
+<style>
+  /* older news items stay collapsed until the toggle is clicked */
+  .news-older { display:none; }
+  .news.show-older .news-older { display:list-item; }
+
+  #news-toggle {
+    background:none;
+    border:0;
+    padding:0;
+    margin-top:8px;
+    font:inherit;
+    font-size:0.9em;
+    font-weight:600;
+    color:#991818;
+    cursor:pointer;
+  }
+
+  #news-toggle:hover { text-decoration:underline; }
+</style>
 </head>
 <body>
   <div style="position: fixed; top: 40px; left: 40px; z-index: 1000;">
@@ -68,7 +87,7 @@
     <div class="content row">
       <div class="col-md-8">
 		<p>
-		Hello! I am a third-year Ph.D. student in the Department of Computer Science at Purdue University, advised by <a href="https://www.cs.purdue.edu/homes/dgoldwas/">Prof. Dan Goldwasser</a>. My work centers on using natural language processing to understand and draw conclusions from large amounts of unstructured data. In particular, I've built scalable and interpretable NLP systems that reason about human behavior, beliefs, emotions, and values as expressed in noisy real-world corpora—especially social media.
+		Hello! I am a fourth-year Ph.D. student in the Department of Computer Science at Purdue University, advised by <a href="https://www.cs.purdue.edu/homes/dgoldwas/">Prof. Dan Goldwasser</a>. My work centers on using natural language processing to understand and draw conclusions from large amounts of unstructured data. In particular, I've built scalable and interpretable NLP systems that reason about human behavior, beliefs, emotions, and values as expressed in noisy real-world corpora—especially social media.
 		</p>
 		<p>
 			During my Ph.D., I developed <a href="https://arxiv.org/abs/2504.07228">ConceptCarve</a>, a framework for identifying how abstract social concepts are expressed across communities by combining language model reasoning with scalable retrieval. I introduced <a href="https://arxiv.org/abs/2504.04640">Splits!</a>, a Reddit 9.6M-post sandbox for investigating how different demographic groups communicate about shared topics. I also investigated social concepts in a multimodal setting, developing <a href="https://arxiv.org/abs/2506.11162">VIBE</a>, a benchmark for evaluating how well VLMs interpret visual cues in videos, and <a href="https://arxiv.org/abs/2601.20032">TAIGR</a>, a framework for modeling influencer content on social media via structured, pragmatic inference.
@@ -91,42 +110,63 @@
       <div class="col-md-12 news-container">
         <p>News</p>
         <div class="myBox">
-          <ul class="news">
+          <ul class="news" id="news-list">
             <!-- newest first -->
+            <li>[Aug 2026] 💻
+              We released <a href="https://culture-in-nlp.pages.dev/"><em>CultureMINE</em></a>, a searchable repository of annotated papers on culture in NLP, with tags and a task/method/dataset taxonomy.
+            </li>
+            <li>[Jul 2026] 🏆
+              Our paper, <a href="https://aclanthology.org/2026.acl-long.117/"><em>Splits!</em></a>, received a Senior Area Chair Highlight Award at ACL 2026!
+            </li>
             <li>[Jul 2026] ✈️
-              Looking forward to attending ACL 2026 in San Diego!
+              Attended ACL 2026 in San Diego!
             </li>
             <li>[May 2026] 💼
-              Excited to share that I'll be joining AWS AI as an Applied Science intern in Santa Clara, CA for the summer!
+              Joined <a href="https://www.amazon.science/">AWS AI</a> as an Applied Science intern in Santa Clara, CA for the summer!
             </li>
             <li>[Apr 2026] 🎉
-              Our paper, <a href="https://arxiv.org/abs/2504.04640"><em>Splits! Flexible Sociocultural Linguistic Investigation at Scale</em></a>, was accepted to ACL 2026 Main as an oral!
+              Our survey, <a href="https://aclanthology.org/2026.nlpcss-1.14/"><em>Datasets and Methods for Improving the Cultural Capabilities of NLP Systems: A Survey</em></a>, was accepted to the NLP+CSS Workshop at ACL 2026!
             </li>
             <li>[Apr 2026] 🎉
-              Our paper, <a href="https://arxiv.org/abs/2601.20032"><em>TAIGR: Towards Modeling Influencer Content on Social Media via Structured, Pragmatic Inference</em></a>, was accepted to ACL 2026 Main Conference.
+              Our paper, <a href="https://aclanthology.org/2026.acl-long.117/"><em>Splits! Flexible Sociocultural Linguistic Investigation at Scale</em></a>, was accepted to ACL 2026 Main as an oral!
+            </li>
+            <li>[Apr 2026] 🎉
+              Our paper, <a href="https://aclanthology.org/2026.acl-long.1868/"><em>TAIGR: Towards Modeling Influencer Content on Social Media via Structured, Pragmatic Inference</em></a>, was accepted to ACL 2026 Main as an oral!
             </li>
             <li>[Nov 2025] ✈️
-              Looking forward to attending EMNLP 2025 in Suzhou, China!
+              Attended EMNLP 2025 in Suzhou, China!
             </li>
             <li>[Aug 2025] 🎉
-              Our paper, <a href="https://arxiv.org/abs/2506.11162"><em>VIBE: Can a VLM Read the Room?</em></a>, has been accepted to Findings of EMNLP 2025.
+              Our paper, <a href="https://aclanthology.org/2025.findings-emnlp.1252/"><em>VIBE: Can a VLM Read the Room?</em></a>, has been accepted to Findings of EMNLP 2025.
             </li>
             <li>[Jul 2025] ✈️
-              Looking forward to attending ACL 2025 in Vienna, Austria!
+              Attended ACL 2025 in Vienna, Austria!
             </li>
-            <li>[May 2025] 🎉
+            <li class="news-older">[May 2025] 🎉
               Our paper, <a href="https://aclanthology.org/2025.acl-long.1014/"><em>ConceptCarve: Dynamic Realization of Evidence</em></a>, has been accepted to ACL 2025 Main Conference.
             </li>
-            <li>[Jan 2025] 💻
+            <li class="news-older">[Jan 2025] 💻
               I created and released <a href="https://github.com/eyloncaplan/acl-searcher"><em>ACL Searcher</em></a>, an open-source semantic search tool for ACL paper abstracts using ColBERT.
             </li>
-            <li>[Aug 2023] 🎓
+            <li class="news-older">[Aug 2023] 🎓
               Started my Ph.D. in Computer Science at Purdue University (advisor: Dan Goldwasser).
             </li>
           </ul>
+          <button type="button" id="news-toggle" aria-expanded="false" aria-controls="news-list">Show older news &#9662;</button>
         </div>
       </div>
     </div>
   </div>
+  <script>
+    (function () {
+      var list = document.getElementById('news-list');
+      var btn = document.getElementById('news-toggle');
+      btn.addEventListener('click', function () {
+        var open = list.classList.toggle('show-older');
+        btn.setAttribute('aria-expanded', open);
+        btn.innerHTML = open ? 'Show less &#9652;' : 'Show older news &#9662;';
+      });
+    })();
+  </script>
 </body>
 </html>
