@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIBE Benchmark: Can a VLM Read the Room?</title>
+<meta name="description" content="Frontier VLMs and MLLMs can see a smile. But they can't tell you what it means. VIBE results for current open and API models.">
+<link rel="icon" type="image/x-icon" href="../../images/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #ecebe6; --surface: #fcfcfb; --surface-2: #f3f2ee; --line: #e4e3df;
+  --ink: #0b0b0b; --ink-2: #52514e; --ink-3: #8a8983;
+  --right: #1a7f4b; --wrong: #c43c3b; --accent: #2a78d6;
+  --human: #0b0b0b;
+  --f-gpt: #e34948; --f-claude: #008300; --f-gemini: #6250d6; --f-qwen: #2a78d6;
+  --f-gemma: #1baf7a; --f-internvl: #eda100; --f-cogvlm: #eb6834;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #111110; --surface: #1a1a19; --surface-2: #242422; --line: #34342f;
+    --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8f8e86;
+    --right: #4cc38a; --wrong: #e66767; --accent: #3987e5; --human: #f0efec;
+    --f-gpt: #e66767; --f-claude: #2f9e2f; --f-gemini: #9085e9; --f-qwen: #3987e5;
+    --f-gemma: #199e70; --f-internvl: #c98500; --f-cogvlm: #d95926;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #111110; --surface: #1a1a19; --surface-2: #242422; --line: #34342f;
+  --ink: #f0efec; --ink-2: #c3c2b7; --ink-3: #8f8e86;
+  --right: #4cc38a; --wrong: #e66767; --accent: #3987e5; --human: #f0efec;
+  --f-gpt: #e66767; --f-claude: #2f9e2f; --f-gemini: #9085e9; --f-qwen: #3987e5;
+  --f-gemma: #199e70; --f-internvl: #c98500; --f-cogvlm: #d95926;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 17px/1.6 "Open Sans", system-ui, sans-serif; }
+/* The whole post is one long card on a slightly darker page; text, charts and the animation share its width. */
+main { max-width: 1120px; margin: 32px auto 64px; padding: 56px 40px 80px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 16px; }
+@media (max-width: 720px) { main { margin: 0; padding: 32px 16px 64px; border-radius: 0; border-width: 0; } }
+.wide { width: 100%; }
+h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 8px; letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin: 64px 0 8px; }
+.dek { font-size: 1.2rem; color: var(--ink-2); margin: 0 0 12px; }
+.byline { color: var(--ink-3); font-size: .9rem; margin-bottom: 16px; }
+p { margin: 0 0 14px; }
+a { color: var(--accent); }
+.muted { color: var(--ink-2); }
+.small { font-size: .85rem; color: var(--ink-2); }
+.num { font-variant-numeric: tabular-nums; }
+.kicker { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ---- question card (hook + quiz) ---- */
+.qcard { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface-2);
+  max-width: 728px; margin: 20px auto; }
+.qmedia { position: relative; background: #000; aspect-ratio: 16 / 9; }
+.qmedia video { width: 100%; height: 100%; display: block; object-fit: contain; }
+/* The fact is a light card near the bottom; its light fill and label keep it apart from (often burned-in) subtitles. */
+.fact-chip { position: absolute; bottom: 10px; left: 50%; width: max-content; max-width: calc(100% - 24px); text-align: center;
+  padding: 4px 46px 5px; border-radius: 9px; background: #fffdf6; color: #141414; font-size: .95rem; line-height: 1.4;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .35); border-top: 3px solid #ffb703;
+  opacity: 0; transform: translate(-50%, 10px); transition: opacity .5s, transform .5s; }
+.fact-chip.on { opacity: 1; transform: translate(-50%, 0); }
+.fact-chip b { display: block; font-size: .66rem; letter-spacing: .12em; color: #9a6a00; font-weight: 700; }
+@media (max-width: 560px) { .fact-chip { font-size: .8rem; bottom: 6px; padding: 3px 26px 4px; } }
+.paper { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); padding: 14px 16px; margin: 0 0 40px; }
+.paper-title { font-weight: 700; }
+.paper-btns { display: flex; gap: 8px; }
+.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); text-decoration: none; }
+a.btn { text-decoration: none; display: inline-block; }
+.cite { position: relative; }
+.cite .btn { position: absolute; top: 8px; right: 8px; font-size: .75rem; padding: 4px 10px; }
+.qbody { padding: 16px; }
+.qprompt { font-weight: 600; margin-bottom: 10px; }
+.opts { display: grid; gap: 10px; }
+.opt { text-align: left; font: inherit; font-size: .95rem; color: var(--ink); background: var(--surface); cursor: pointer;
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
+  transition: border-color .2s, background .2s; }
+.opt:hover:not([disabled]) { border-color: var(--ink-3); }
+.opt[disabled] { cursor: default; }
+.opt .letter { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 700; font-size: .85rem; background: var(--surface-2); border: 1px solid var(--line); }
+.opt.right { border-color: var(--right); }
+.opt.right .letter { background: var(--right); color: #fff; border-color: var(--right); }
+.opt.wrongpick { border-color: var(--wrong); }
+.opt.wrongpick .letter { background: var(--wrong); color: #fff; border-color: var(--wrong); }
+.opt .tag { margin-left: auto; flex: none; font-size: .75rem; font-weight: 700; padding-top: 3px; }
+.opt.right .tag { color: var(--right); }
+.opt.wrongpick .tag { color: var(--wrong); }
+.reveal { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.reveal.on { display: block; animation: fade .4s; }
+.picks { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.pick { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; padding: 4px 9px 4px 6px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); }
+.pick i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.pick .res { font-weight: 700; }
+.pick .res.r { color: var(--right); } .pick .res.w { color: var(--wrong); }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ---- perceive vs interpret animation ---- */
+.anim { border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); padding: 16px; margin: 20px 0; }
+.anim-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: center; }
+@media (max-width: 720px) { .anim-grid { grid-template-columns: 1fr; } }
+.anim .qmedia { border-radius: 8px; overflow: hidden; }
+.zoomer { position: absolute; inset: 0; transform-origin: 0 0; transition: transform 1s cubic-bezier(.4, 0, .2, 1); }
+.zoomer video { width: 100%; height: 100%; display: block; object-fit: contain; }
+.zoomer.zoomed .lbl { opacity: 0; }
+.scanbox { position: absolute; border: 2.5px solid #ffd166; border-radius: 6px; left: 28%; top: 14%; width: 14%; height: 30%;
+  opacity: 0; transform: scale(1.6); transition: opacity .35s, transform .6s cubic-bezier(.2,.9,.3,1.2); box-shadow: 0 0 0 9999px rgba(0,0,0,0); }
+.scanbox.on { opacity: 1; transform: scale(1); box-shadow: 0 0 0 9999px rgba(0,0,0,.35); }
+.scanbox .lbl { position: absolute; left: 50%; top: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap;
+  background: #ffd166; color: #111; font-size: .78rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.steps { display: flex; gap: 8px; margin-bottom: 12px; }
+.step { font-size: .78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-3);
+  transition: all .3s; }
+.step.on { color: var(--ink); border-color: var(--ink); }
+.reading { position: relative; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface);
+  margin-bottom: 10px; opacity: 0; transform: translateX(14px); transition: opacity .45s, transform .45s, border-color .4s; font-size: .92rem; }
+.reading.on { opacity: 1; transform: none; }
+.reading .dots { display: flex; flex-wrap: wrap; gap: 5px; min-height: 16px; margin-top: 8px; }
+.reading .dot { width: 14px; height: 14px; border-radius: 50%; transform: scale(0); transition: transform .35s cubic-bezier(.2,.9,.3,1.4); }
+.reading .dot.on { transform: scale(1); }
+.reading .verdict { font-size: .75rem; font-weight: 700; margin-top: 6px; opacity: 0; transition: opacity .4s; }
+.reading.truth { border-color: var(--right); } .reading.truth .verdict { color: var(--right); opacity: 1; }
+.reading.miss { border-color: var(--wrong); } .reading.miss .verdict { color: var(--wrong); opacity: 1; }
+.anim-caption { min-height: 3.2em; margin-top: 12px; font-size: .95rem; color: var(--ink-2); transition: opacity .3s; }
+.anim-caption b { color: var(--ink); }
+.btn { font: inherit; font-size: .85rem; font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--ink-3); }
+
+/* ---- charts ---- */
+figure { margin: 24px 0; }
+figcaption { font-size: .85rem; color: var(--ink-2); margin-top: 8px; }
+.chart { width: 100%; position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: "Open Sans", system-ui, sans-serif; fill: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--ink-2); margin: 6px 0 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--surface); font-size: .8rem; line-height: 1.4;
+  padding: 7px 10px; border-radius: 6px; opacity: 0; transition: opacity .12s; max-width: 260px; }
+.tip.on { opacity: 1; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: .85rem; font-weight: 600; color: var(--ink-2); background: var(--surface); border: 0; padding: 6px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on { background: var(--ink); color: var(--surface); }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 14px 0; font-size: .85rem; color: var(--ink-2); }
+.strip { display: grid; grid-template-columns: repeat(26, 1fr); gap: 3px; margin: 10px 0; }
+@media (max-width: 720px) { .strip { grid-template-columns: repeat(13, 1fr); } }
+.strip i { aspect-ratio: 16 / 9; background-repeat: no-repeat; border-radius: 2px; opacity: .14; filter: grayscale(1);
+  transition: opacity .25s, filter .25s, outline-color .25s; outline: 2px solid transparent; outline-offset: -2px; }
+.strip i.on { opacity: 1; filter: none; outline-color: #ffd166; }
+.score { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--surface-2); display: none; }
+.score.on { display: block; animation: fade .4s; }
+.score table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.score td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.score td:last-child { text-align: right; font-weight: 700; }
+.score tr.you td { font-weight: 700; }
+.links { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 16px 0; }
+.links a { display: block; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--ink); background: var(--surface-2); }
+.links a span { display: block; font-size: .8rem; color: var(--ink-2); }
+pre { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; font-size: .75rem; overflow-x: auto; }
+.static *, .static *::after { transition: none !important; animation: none !important; }
+.site-nav { display: flex; gap: 8px; font-size: .85rem; color: var(--ink-3); margin: -24px 0 28px; }
+.site-nav a { color: var(--ink-2); text-decoration: none; } .site-nav a:hover { color: var(--ink); text-decoration: underline; }
+.theme-toggle { position: fixed; top: 12px; right: 12px; z-index: 5; }
+</style>
+</head>
+<body>
+<button class="btn theme-toggle" id="theme" aria-label="Toggle dark mode">◐</button>
+<div class="tip" id="tip"></div>
+<main>
+  <nav class="site-nav"><a href="../../index.html">Eylon Caplan</a><span>·</span><a href="../../blogs.html">Blogs</a></nav>
+  <h1>VIBE Benchmark: Can a VLM read the room?</h1>
+  <p class="dek">Frontier VLMs and MLLMs can see a smile. But they can't tell you what it means.</p>
+  <div class="byline">Blog post by Eylon Caplan · October 2026</div>
+  <div class="paper">
+    <div>
+      <div class="kicker">Based on the paper</div>
+      <div class="paper-title">VIBE: Can a VLM Read the Room?</div>
+      <div class="small">Tania Chakraborty, Eylon Caplan, Dan Goldwasser · Findings of EMNLP 2025</div>
+    </div>
+    <div class="paper-btns">
+      <a class="btn primary" href="https://aclanthology.org/2025.findings-emnlp.1252/">Paper</a>
+      <a class="btn primary" href="https://huggingface.co/datasets/taniarini/vibe">Dataset</a>
+    </div>
+  </div>
+
+  <!-- 1. Hook -->
+  <p>Watch the clip (no sound), then pick the interpretation that fits best.</p>
+  <div class="qcard" id="hook"></div>
+
+  <!-- 2. Seeing isn't understanding -->
+  <h2>Seeing isn't understanding</h2>
+  <p>Most work on VLM failures is about <em>perception</em>: did the model hallucinate something that isn't there?
+    VIBE targets the next step. The cue is guaranteed to be in the video; the question is what it <em>means</em> in context.
+    We call this <b>visual social-pragmatic (VSP) inference</b>.</p>
+  <div class="anim wide" id="anim">
+    <div class="steps"><span class="step" data-s="1">1 · Perceive</span><span class="step" data-s="2">2 · Interpret</span>
+      <button class="btn" id="replay" style="margin-left:auto">↻ Restart</button></div>
+    <div class="anim-grid">
+      <div class="qmedia"><div class="zoomer"><video muted loop playsinline preload="auto"></video>
+        <div class="scanbox"><span class="lbl">cue: a smile ✓</span></div></div></div>
+      <div class="readings"></div>
+    </div>
+    <div class="anim-caption"></div>
+  </div>
+
+  <!-- 3. What is a VIBE question + quiz -->
+  <h2>What's in VIBE</h2>
+  <p>Each of the <b>994 questions</b> pairs a short clip (433 clips, all under 4 seconds, from English and Chinese TV shows)
+    with one observable <b>fact</b> about the speaker and two <b>interpretations</b> of it. One is right.
+    Every fact and answer was checked by at least two human annotators who agreed perfectly.</p>
+  <p>Try three. These are hard cases we picked because most models missed them.</p>
+  <div id="quiz"></div>
+  <div class="score" id="score"></div>
+
+  <!-- 4. Headline -->
+  <h2>Nobody is close to humans</h2>
+  <p>We ran four current open models and four frontier API models on all 994 questions, giving every model the same
+    30 frames per clip. The best model, GPT-6.1 Sol, scores <b class="num" data-v="best"></b>.
+    People score <b class="num" data-v="human"></b>.</p>
+  <figure class="wide">
+    <div class="legend" id="bar-legend"></div>
+    <div class="chart" id="bars"></div>
+    <figcaption>Accuracy on all 994 questions, 30 frames per clip. Bars start at chance (50%). Hatched = thinking on.
+      Whiskers: 95% CI.
+      Paper models from the original VIBE paper. *InternVL2-26B is footnoted there: the dataset was partly built from its mistakes.</figcaption>
+  </figure>
+
+  <!-- 6. Cost -->
+  <h2>Performance gains are expensive</h2>
+  <p>The API models are the most accurate. One pass over the benchmark costs
+    <b class="num" data-v="cost-range"></b> through their APIs, against roughly $0.30 to $1.65 of GPU time for the open
+    models, and the best API model is only 4.5 points more accurate than the best open one. The most expensive run,
+    Claude Opus 5.5, still finishes 12 points below people.</p>
+  <figure class="wide">
+    <div class="chart" id="cost"></div>
+    <figcaption>Cost of one pass over all 994 questions (log scale). API models: measured, at batch prices (half of list).
+      Open models: estimated from measured GPU time at $2.50 per H100-hour; hollow points.</figcaption>
+  </figure>
+
+  <!-- 7. Thinking -->
+  <h2>Thinking more doesn't help</h2>
+  <p>We compared each open model with reasoning off and on, and each Gemini model at medium and high reasoning effort.
+    Every change is within about a point, and every 95% interval includes zero.</p>
+  <figure class="wide">
+    <div class="chart" id="thinking"></div>
+    <figcaption>Paired change in accuracy, same 994 questions, with 95% bootstrap CI. Open models: thinking off → on
+      (on = mean of 3 seeds). API: reasoning effort medium → high.</figcaption>
+  </figure>
+
+  <!-- 8. Frames -->
+  <h2>More frames also don't help</h2>
+  <p>Social cues can be very brief. So we think closing the gap to humans likely requires a high frame rate, close to
+    the clip's full frame rate (about 24 per second). But with current models, that clearly isn't sufficient. Accuracy
+    with 4 frames is within about a point of accuracy with every frame of the clip. Pick a frame budget to see what the model gets from this clip.</p>
+  <div class="wide">
+  <div class="controls">
+    <span>Frames sent</span><div class="seg" id="fseg"></div>
+    <span>Mode</span><div class="seg" id="mseg"></div>
+  </div>
+  <div class="strip" id="strip"></div>
+  <div class="small" id="strip-note"></div>
+  <figure>
+    <div class="chart" id="frames"></div>
+    <figcaption>Accuracy vs. frames per clip for the open models (all 994 questions; y-axis zoomed). Clips are short:
+      at 60 requested, models get every frame of the clip, 50 on average. For the Qwen models, more frames also means
+      lower resolution per frame.</figcaption>
+  </figure>
+  </div>
+
+  <!-- 9. Takeaway -->
+  <h2>Takeaway</h2>
+  <p>It's been a year and a half since the VIBE paper came out. In that time, the best score went from 75% to 81%.
+    That's progress, but the best model is still 11 points behind people.</p>
+  <div class="links">
+    <a href="https://aclanthology.org/2025.findings-emnlp.1252/">Paper<span>Findings of EMNLP 2025</span></a>
+    <a href="https://huggingface.co/datasets/taniarini/vibe">Dataset<span>VIBE on Hugging Face, MIT license</span></a>
+  </div>
+  <div class="cite"><button class="btn" id="copy-cite">Copy</button>
+  <pre id="bibtex">@inproceedings{chakraborty-etal-2025-vibe,
+  title     = {{VIBE}: Can a {VLM} Read the Room?},
+  author    = {Chakraborty, Tania and Caplan, Eylon and Goldwasser, Dan},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2025},
+  pages     = {22992--23008},
+  year      = {2025}
+}</pre></div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = VIBE;
+const $ = (s, el = document) => el.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const FAMILY = n => n.startsWith("GPT") ? "gpt" : n.startsWith("Claude") ? "claude" : n.startsWith("Gemini") ? "gemini"
+  : n.startsWith("Qwen") ? "qwen" : n.startsWith("Gemma") ? "gemma" : n.startsWith("InternVL") ? "internvl"
+  : n.startsWith("Cog") ? "cogvlm" : "human";
+const FAM_LABEL = { gpt: "GPT", claude: "Claude", gemini: "Gemini", qwen: "Qwen", gemma: "Gemma", internvl: "InternVL", cogvlm: "CogVLM" };
+const fc = n => `var(--f-${FAMILY(n)})`;
+
+// ---------- copy citation ----------
+$("#copy-cite").onclick = async e => {
+  try { await navigator.clipboard.writeText($("#bibtex").textContent); e.target.textContent = "Copied"; }
+  catch { getSelection().selectAllChildren($("#bibtex")); e.target.textContent = "Press ⌘/Ctrl+C"; }
+  setTimeout(() => e.target.textContent = "Copy", 1800);
+};
+
+// ---------- theme ----------
+$("#theme").onclick = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+  document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+};
+
+// ---------- tooltip ----------
+const tip = $("#tip");
+function showTip(e, html) {
+  tip.innerHTML = html; tip.classList.add("on");
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px";
+}
+const hideTip = () => tip.classList.remove("on");
+
+// ---------- svg helpers ----------
+function svg(w, h) { const s = document.createElementNS(NS, "svg"); s.setAttribute("viewBox", `0 0 ${w} ${h}`); return s; }
+function el(parent, tag, attrs = {}, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text != null) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const lin = (d0, d1, r0, r1) => v => r0 + (v - d0) / (d1 - d0) * (r1 - r0);
+
+// ?static shows every reveal-on-delay element at once (for screenshots and print).
+const STATIC = new URLSearchParams(location.search).has("static");
+if (STATIC) document.documentElement.classList.add("static");
+const sources = mp4 => `<source src="${mp4}" type="video/mp4"><source src="${mp4.replace(/\.mp4$/, ".webm")}" type="video/webm">`;
+
+// ---------- question cards (hook + quiz) ----------
+function pickChips(ex) {
+  return ex.picks.map(p => {
+    const ok = p.pred === ex.gold;
+    return `<span class="pick"><i style="background:${fc(p.name)}"></i>${p.name}
+      <span class="res ${ok ? "r" : "w"}">${p.pred ?? "–"} ${ok ? "✓" : "✗"}</span></span>`;
+  }).join("");
+}
+function questionCard(host, ex, opts = {}) {
+  host.innerHTML = `
+    <div class="qmedia"><video poster="${ex.poster}" muted loop playsinline autoplay preload="auto">${sources(ex.clip)}</video>
+      <div class="fact-chip"><b>FACT</b>${ex.fact}</div></div>
+    <div class="qbody">
+      <div class="qprompt">${opts.prompt || "Which interpretation fits?"}</div>
+      <div class="opts">
+        ${["a", "b"].map(k => `<button class="opt" data-k="${k.toUpperCase()}"><span class="letter">${k.toUpperCase()}</span>
+          <span>${ex[k]}</span><span class="tag"></span></button>`).join("")}
+      </div>
+      <div class="reveal">
+        <div class="small">What the models picked</div>
+        <div class="picks">${pickChips(ex)}</div>
+        <div class="small">${ex.picks.filter(p => p.pred !== ex.gold).length} of ${ex.picks.length} models chose the wrong reading.</div>
+      </div>
+    </div>`;
+  const chip = $(".fact-chip", host);
+  if (STATIC) chip.classList.add("on"); else setTimeout(() => chip.classList.add("on"), opts.factDelay ?? 900);
+  host.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    host.querySelectorAll(".opt").forEach(o => {
+      o.disabled = true;
+      if (o.dataset.k === ex.gold) { o.classList.add("right"); $(".tag", o).textContent = o === b ? "✓ You" : "✓ Answer"; }
+      else if (o === b) { o.classList.add("wrongpick"); $(".tag", o).textContent = "✗ You"; }
+    });
+    chip.classList.add("on");
+    $(".reveal", host).classList.add("on");
+    opts.onAnswer && opts.onAnswer(b.dataset.k === ex.gold);
+  });
+}
+questionCard($("#hook"), D.examples.hook, { prompt: "Which interpretation fits?" });
+
+// ---------- perceive vs interpret animation ----------
+(function () {
+  const ex = D.examples.anatomy, root = $("#anim"), video = $("video", root), box = $(".scanbox", root);
+  const cap = $(".anim-caption", root), readings = $(".readings", root);
+  video.innerHTML = sources(ex.clip); video.poster = ex.poster; video.load();
+  readings.innerHTML = ["A", "B"].map(k => `<div class="reading" data-k="${k}"><b>${k}.</b> ${ex[k.toLowerCase()]}
+    <div class="dots"></div><div class="verdict"></div></div>`).join("");
+  let timers = [];
+  // Under ?static every step runs at once, leaving the final frame on screen.
+  const at = (ms, f) => STATIC ? f() : timers.push(setTimeout(f, ms));
+  const step = s => root.querySelectorAll(".step").forEach(e => e.classList.toggle("on", +e.dataset.s === s));
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    box.classList.remove("on"); step(0);
+    readings.querySelectorAll(".reading").forEach(r => { r.className = "reading"; $(".dots", r).innerHTML = ""; $(".verdict", r).textContent = ""; });
+    cap.innerHTML = "";
+  }
+  // The highlight box sits on the face in the paused frame; zooming centres that face.
+  const [bl, bt, bw, bh] = ex.pause.box, Z = 2.8, cx = bl + bw / 2, cy = bt + bh / 2;
+  Object.assign(box.style, { left: bl + "%", top: bt + "%", width: bw + "%", height: bh + "%" });
+  const zoomer = $(".zoomer", root);
+  const zoom = on => {
+    zoomer.classList.toggle("zoomed", on);
+    zoomer.style.transform = on ? `translate(${50 - Z * cx}%, ${50 - Z * cy}%) scale(${Z})` : "";
+  };
+  let running = false;
+  function play() {
+    reset(); zoom(false); running = true; video.currentTime = 0; video.play();
+    at(300, () => { step(1); cap.innerHTML = `<b>Perceive.</b> The fact: “${ex.fact}”`; });
+    // Freeze on a frame where the smile is plain to see, box it, zoom in on it, then zoom out and play on.
+    at(1500, () => { video.pause(); video.currentTime = ex.pause.time; });
+    at(1700, () => box.classList.add("on"));
+    at(2500, () => zoom(true));
+    at(4700, () => zoom(false));
+    at(5700, () => { box.classList.remove("on"); video.play();
+      cap.innerHTML = `<b>Perceive.</b> The fact: “${ex.fact}” Spotting the cue is the easy part.`; });
+    at(6500, () => { step(2); cap.innerHTML = `<b>Interpret.</b> What does the smile mean here? Each dot is one model's answer.`;
+      readings.querySelectorAll(".reading").forEach(r => r.classList.add("on")); });
+    ex.picks.forEach((p, i) => at(7300 + i * 260, () => {
+      const r = readings.querySelector(`.reading[data-k="${p.pred}"] .dots`);
+      if (!r) return;
+      const d = document.createElement("i"); d.className = "dot"; d.style.background = fc(p.name); d.title = p.name;
+      r.appendChild(d);
+      if (STATIC) d.classList.add("on"); else requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add("on")));
+    }));
+    const tEnd = 7300 + ex.picks.length * 260 + 600;
+    at(tEnd, () => {
+      const nWrong = ex.picks.filter(p => p.pred !== ex.gold).length;
+      readings.querySelectorAll(".reading").forEach(r => {
+        const truth = r.dataset.k === ex.gold;
+        r.classList.add(truth ? "truth" : "miss");
+        $(".verdict", r).textContent = truth ? "✓ Human-verified answer" : `✗ ${nWrong} of ${ex.picks.length} models`;
+      });
+      cap.innerHTML = `<b>Every model can see the smile. ${nWrong} of ${ex.picks.length} misread it.</b> The cue was right; the reading was wrong.`;
+    });
+    if (!STATIC) at(tEnd + 5000, play);  // loop the whole thing
+  }
+  function stop() { reset(); zoom(false); video.pause(); running = false; }
+  $("#replay").onclick = play;
+  if (STATIC) video.addEventListener("loadeddata", play, { once: true });
+  // Runs only while on screen: starts from the top on entering, stops on leaving.
+  else new IntersectionObserver(es => { if (es[0].isIntersecting) { if (!running) play(); } else if (running) stop(); },
+    { threshold: .5 }).observe(root);
+})();
+
+// ---------- quiz ----------
+(function () {
+  const items = [D.examples.quiz0, D.examples.quiz1, D.examples.quiz2], answers = [];
+  const host = $("#quiz");
+  items.forEach((ex, i) => {
+    const card = document.createElement("div"); card.className = "qcard"; host.appendChild(card);
+    questionCard(card, ex, { prompt: `Question ${i + 1} of ${items.length}. Which interpretation fits?`, factDelay: 400,
+      onAnswer: ok => { answers[i] = ok; if (answers.filter(a => a !== undefined).length === items.length) score(); } });
+  });
+  function score() {
+    const you = answers.filter(Boolean).length;
+    const models = items[0].picks.map((p, j) => ({ name: p.name, n: items.filter(ex => ex.picks[j].pred === ex.gold).length }))
+      .sort((a, b) => b.n - a.n);
+    const s = $("#score");
+    s.innerHTML = `<div class="kicker">Your score on these three</div>
+      <table><tr class="you"><td>You</td><td>${you} / 3</td></tr>
+      ${models.map(m => `<tr><td><span class="pick" style="border:0;padding:0;background:none"><i style="background:${fc(m.name)}"></i>${m.name}</span></td><td>${m.n} / 3</td></tr>`).join("")}
+      </table><p class="small" style="margin:10px 0 0">These were picked because models miss them. On the full set the best model gets about 4 in 5 right; people get more than 9 in 10.</p>`;
+    s.classList.add("on");
+  }
+})();
+
+// ---------- numbers in text ----------
+const best = D.bars.filter(b => b.group !== "paper").sort((a, b) => b.acc - a.acc)[0];
+const fill = (k, v) => document.querySelectorAll(`[data-v="${k}"]`).forEach(e => e.textContent = v);
+fill("best", best.acc.toFixed(1) + "%"); fill("human", D.human + "%");
+const apiCost = D.cost.filter(c => c.group === "api").map(c => c.usd);
+fill("cost-range", `$${Math.min(...apiCost).toFixed(2)} to $${Math.max(...apiCost).toFixed(2)}`);
+
+// ---------- headline bars ----------
+function drawBars() {
+  const host = $("#bars"); host.innerHTML = "";
+  const rows = [{ name: "Humans", group: "human", acc: D.human, ci: D.human_ci, thinking: false },
+    ...D.bars.map(b => ({ ...b, name: b.effort ? `${b.name} (${b.effort})` : b.name }))].sort((a, b) => b.acc - a.acc);
+  const W = 1000, rh = 24, top = 26, L = 220, R = 60, H = top + rows.length * rh + 34;
+  const s = svg(W, H), x = lin(50, 100, L, W - R);
+  const defs = el(s, "defs");
+  for (const f of Object.keys(FAM_LABEL)) {
+    const p = el(defs, "pattern", { id: `hatch-${f}`, width: 6, height: 6, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
+    el(p, "rect", { width: 6, height: 6, fill: css("--surface") });
+    el(p, "rect", { width: 2.2, height: 6, fill: css(`--f-${f}`) });
+  }
+  for (let v = 50; v <= 100; v += 10) {
+    el(s, "line", { x1: x(v), x2: x(v), y1: top - 6, y2: H - 30, stroke: css("--line") });
+    el(s, "text", { x: x(v), y: H - 12, "text-anchor": "middle", "font-size": 13 }, v === 50 ? "50 (chance)" : v);
+  }
+  el(s, "line", { x1: x(D.human), x2: x(D.human), y1: top - 6, y2: H - 30, stroke: css("--ink"), "stroke-dasharray": "3 3" });
+  el(s, "text", { x: x(D.human), y: top - 12, "text-anchor": "middle", "font-size": 12, fill: css("--ink") }, "human");
+  rows.forEach((r, i) => {
+    const y = top + i * rh, fam = FAMILY(r.name), c = r.group === "human" ? css("--human") : css(`--f-${fam}`);
+    const g = el(s, "g", { cursor: "default" });
+    const label = r.group === "paper" ? `${r.name} (2025 paper)` : r.name;
+    el(g, "text", { x: L - 10, y: y + rh / 2 + 4, "text-anchor": "end", "font-size": 13,
+      fill: r.group === "human" ? css("--ink") : css("--ink-2"), "font-weight": r.group === "human" ? 700 : 400 }, label);
+    el(g, "rect", { x: x(50), y: y + 3, width: Math.max(0, x(r.acc) - x(50)), height: rh - 6, rx: 3,
+      fill: r.thinking ? `url(#hatch-${fam})` : c, stroke: c, "stroke-width": 1.2 });
+    // Humans get no whisker: the paper reports only 2 annotators x 100 questions.
+    const ci = r.group === "human" ? 0 : r.ci;
+    if (ci) el(g, "line", { x1: x(r.acc - ci), x2: x(r.acc + ci), y1: y + rh / 2, y2: y + rh / 2, stroke: css("--ink"), "stroke-width": 1.2 });
+    el(g, "text", { x: x(r.acc + ci) + 6, y: y + rh / 2 + 4, "font-size": 12, fill: css("--ink") }, r.acc.toFixed(1));
+    el(g, "rect", { x: 0, y, width: W, height: rh, fill: "transparent" });
+    const kind = r.group === "human" ? "2 annotators × 100 questions" : r.group === "paper" ? "2025 paper, CoT prompt"
+      : r.group === "api" ? "API, thinking on" : `open model, thinking ${r.thinking ? "on (3 seeds)" : "off"}`;
+    g.onmousemove = e => showTip(e, `<b>${label}</b><br>${r.acc.toFixed(1)}%${ci ? ` ± ${ci} (95% CI)` : ""}<br>${kind}`);
+    g.onmouseleave = hideTip;
+  });
+  host.appendChild(s);
+  $("#bar-legend").innerHTML = Object.entries(FAM_LABEL).map(([f, l]) => `<span><i style="background:var(--f-${f})"></i>${l}</span>`).join("")
+    + `<span><i style="background:repeating-linear-gradient(45deg,var(--ink-2) 0 2px,transparent 2px 5px);border:1px solid var(--ink-2)"></i>thinking on</span>`;
+}
+
+// ---------- cost scatter ----------
+function drawCost() {
+  const host = $("#cost"); host.innerHTML = "";
+  const W = 1000, H = 440, L = 60, R = 30, T = 20, B = 50;
+  const s = svg(W, H), lx = v => Math.log10(v), x = lin(lx(0.2), lx(50), L, W - R), y = lin(73, 95, H - B, T);
+  [0.25, 0.5, 1, 2, 5, 10, 25, 50].forEach(v => {
+    el(s, "line", { x1: x(lx(v)), x2: x(lx(v)), y1: T, y2: H - B, stroke: css("--line") });
+    el(s, "text", { x: x(lx(v)), y: H - B + 20, "text-anchor": "middle", "font-size": 13 }, "$" + v);
+  });
+  [75, 80, 85, 90, 95].forEach(v => {
+    el(s, "line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: css("--line") });
+    el(s, "text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", "font-size": 13 }, v + "%");
+  });
+  el(s, "text", { x: (L + W - R) / 2, y: H - 8, "text-anchor": "middle", "font-size": 13 }, "Cost of one pass over the benchmark (USD, log scale)");
+  el(s, "line", { x1: L, x2: W - R, y1: y(D.human), y2: y(D.human), stroke: css("--ink"), "stroke-dasharray": "4 4" });
+  el(s, "text", { x: W - R - 4, y: y(D.human) - 8, "text-anchor": "end", "font-size": 13, fill: css("--ink"), "font-weight": 700 }, `Humans ${D.human}%`);
+  D.cost.forEach(c => {
+    const label = c.group === "api" ? `${c.name}${c.effort === "high" ? " (high)" : ""}` : `${c.name} (thinking ${c.thinking ? "on" : "off"})`;
+    const col = fc(c.name), cx = x(lx(c.usd)), cy = y(c.acc);
+    const g = el(s, "g");
+    el(g, "circle", { cx, cy, r: 7, fill: c.group === "api" ? col : css("--surface"), stroke: col, "stroke-width": 2 });
+    el(g, "circle", { cx, cy, r: 16, fill: "transparent" });
+    if (c.group === "api" && c.effort === "medium") {
+      // Flash's label is centred above its point, clear of the open models below and the high-effort point to its right.
+      const above = c.name.includes("Flash");
+      el(s, "text", { x: above ? cx : cx + 11, y: above ? cy - 13 : cy - 10, "text-anchor": above ? "middle" : "start",
+        "font-size": 12, fill: css("--ink") }, c.name);
+    }
+    g.onmousemove = e => showTip(e, `<b>${label}</b><br>${c.acc.toFixed(1)}% · $${c.usd.toFixed(2)} per pass<br>` +
+      (c.group === "api" ? `measured, batch price · ${c.out_tokens} output tokens/question` : `estimated · ${c.gpu_h} H100-hours`));
+    g.onmouseleave = hideTip;
+  });
+  el(s, "text", { x: x(lx(0.42)), y: y(73.8), "text-anchor": "middle", "font-size": 12 }, "open models (estimated)");
+  host.appendChild(s);
+}
+
+// ---------- thinking deltas ----------
+function drawThinking() {
+  const host = $("#thinking"); host.innerHTML = "";
+  const rows = D.thinking, W = 1000, rh = 34, T = 24, L = 250, R = 30, H = T + rows.length * rh + 40;
+  const s = svg(W, H), x = lin(-4, 4, L, W - R);
+  [-4, -2, 0, 2, 4].forEach(v => {
+    el(s, "line", { x1: x(v), x2: x(v), y1: T - 8, y2: H - 34, stroke: v === 0 ? css("--ink-2") : css("--line") });
+    el(s, "text", { x: x(v), y: H - 16, "text-anchor": "middle", "font-size": 13 }, (v > 0 ? "+" : "") + v);
+  });
+  el(s, "text", { x: x(-4), y: T - 12, "font-size": 12 }, "hurts"); el(s, "text", { x: x(4), y: T - 12, "text-anchor": "end", "font-size": 12 }, "helps");
+  rows.forEach((r, i) => {
+    const y0 = T + i * rh + rh / 2, d = r.b - r.a, col = fc(r.name), g = el(s, "g");
+    el(g, "text", { x: L - 12, y: y0 + 4, "text-anchor": "end", "font-size": 13, fill: css("--ink") }, r.name);
+    el(g, "text", { x: L - 12, y: y0 + 18, "text-anchor": "end", "font-size": 11 }, r.kind);
+    el(g, "line", { x1: x(r.lo), x2: x(r.hi), y1: y0, y2: y0, stroke: col, "stroke-width": 3, "stroke-linecap": "round", opacity: .45 });
+    el(g, "circle", { cx: x(d), cy: y0, r: 6.5, fill: col, stroke: css("--surface"), "stroke-width": 2 });
+    el(g, "rect", { x: 0, y: y0 - rh / 2, width: W, height: rh, fill: "transparent" });
+    g.onmousemove = e => showTip(e, `<b>${r.name}</b>, ${r.kind}<br>${r.a}% → ${r.b}% (${d >= 0 ? "+" : ""}${d.toFixed(1)} pts)<br>95% CI ${r.lo} to ${r.hi}`);
+    g.onmouseleave = hideTip;
+  });
+  el(s, "text", { x: (L + W - R) / 2, y: H - 0, "text-anchor": "middle", "font-size": 12 }, "change in accuracy (points)");
+  host.appendChild(s);
+}
+
+// ---------- frames: filmstrip + line chart ----------
+const FR = [4, 16, 30, 60];
+let curF = 30, curMode = "nothink";
+function drawStrip() {
+  const f = D.filmstrip, picked = new Set(f.sampled[curF]), host = $("#strip");
+  if (!host.children.length) {
+    for (let i = 0; i < f.native; i++) {
+      const t = document.createElement("i"), r = Math.floor(i / f.cols), c = i % f.cols;
+      t.style.backgroundImage = `url(${f.sprite})`;
+      t.style.backgroundSize = `${f.cols * 100}% ${Math.ceil(f.native / f.cols) * 100}%`;
+      t.style.backgroundPosition = `${c / (f.cols - 1) * 100}% ${r / (Math.ceil(f.native / f.cols) - 1) * 100}%`;
+      host.appendChild(t);
+    }
+  }
+  [...host.children].forEach((t, i) => t.classList.toggle("on", picked.has(i)));
+  $("#strip-note").textContent = `${picked.size} of this clip's ${f.native} frames (${(f.native / 24).toFixed(1)} s) are sent at a budget of ${curF}.`
+    + (curF >= f.native ? " That's every frame of the clip." : "");
+}
+function drawFrames() {
+  const host = $("#frames"); host.innerHTML = "";
+  const W = 1000, H = 330, L = 50, R = 140, T = 16, B = 40;
+  const s = svg(W, H), lx = Math.log2, x = lin(lx(4), lx(60), L, W - R), y = lin(72, 80, H - B, T);
+  [72, 74, 76, 78, 80].forEach(v => {
+    el(s, "line", { x1: L, x2: W - R, y1: y(v), y2: y(v), stroke: css("--line") });
+    el(s, "text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", "font-size": 13 }, v + "%");
+  });
+  FR.forEach(v => el(s, "text", { x: x(lx(v)), y: H - B + 20, "text-anchor": "middle", "font-size": 13,
+    fill: v === curF ? css("--ink") : css("--ink-2"), "font-weight": v === curF ? 700 : 400 }, v));
+  el(s, "rect", { x: x(lx(curF)) - 14, width: 28, y: T, height: H - B - T, fill: "#ffd166", opacity: .25 });
+  el(s, "text", { x: (L + W - R) / 2, y: H - 4, "text-anchor": "middle", "font-size": 12 }, "frames per clip");
+  const names = [...new Set(D.frames.map(r => r.name))];
+  const ends = [];
+  names.forEach(n => {
+    const pts = D.frames.filter(r => r.name === n && r.mode === curMode).sort((a, b) => a.frames - b.frames);
+    const col = fc(n);
+    el(s, "path", { d: pts.map((p, i) => `${i ? "L" : "M"}${x(lx(p.frames))},${y(p.acc)}`).join(""), fill: "none", stroke: col, "stroke-width": 2 });
+    pts.forEach(p => {
+      const g = el(s, "g");
+      el(g, "circle", { cx: x(lx(p.frames)), cy: y(p.acc), r: 5, fill: col, stroke: css("--surface"), "stroke-width": 2 });
+      el(g, "circle", { cx: x(lx(p.frames)), cy: y(p.acc), r: 14, fill: "transparent" });
+      g.onmousemove = e => showTip(e, `<b>${n}</b>, thinking ${curMode === "think" ? "on" : "off"}<br>${p.frames} frames: ${p.acc.toFixed(1)}%`);
+      g.onmouseleave = hideTip;
+    });
+    const last = pts[pts.length - 1]; ends.push({ n, y: y(last.acc), x: x(lx(last.frames)), col });
+  });
+  ends.sort((a, b) => a.y - b.y).forEach((e, i, arr) => { if (i) e.y = Math.max(e.y, arr[i - 1].y + 15); });
+  ends.forEach(e => el(s, "text", { x: W - R + 10, y: e.y + 4, "font-size": 12, fill: css("--ink") }, e.n));
+  host.appendChild(s);
+}
+function segs() {
+  $("#fseg").innerHTML = FR.map(v => `<button class="${v === curF ? "on" : ""}" data-v="${v}">${v}</button>`).join("");
+  $("#mseg").innerHTML = [["nothink", "thinking off"], ["think", "on"]].map(([k, l]) => `<button class="${k === curMode ? "on" : ""}" data-v="${k}">${l}</button>`).join("");
+  $("#fseg").onclick = e => { if (e.target.dataset.v) { curF = +e.target.dataset.v; segs(); drawStrip(); drawFrames(); } };
+  $("#mseg").onclick = e => { if (e.target.dataset.v) { curMode = e.target.dataset.v; segs(); drawFrames(); } };
+}
+
+function drawAll() { drawBars(); drawCost(); drawThinking(); segs(); drawStrip(); drawFrames(); }
+drawAll();
+// Redraw SVG charts when the theme changes, since they read colours at draw time.
+new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+</script>
+</body>
+</html>
