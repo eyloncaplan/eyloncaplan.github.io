@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/eylon.css">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+
+<title>Eylon Caplan</title>
+
+<style>
+  /* Same palette as publications.html. */
+  :root {
+    --ink:      #1F2933;
+    --body:     #34424F;
+    --muted:    #6B7684;
+    --line:     #E6E9ED;
+    --tan:      #D5B282;
+    --tan-dark: #A8814A;
+  }
+
+  /* wider than the other pages so both galleries fit side by side */
+  .container.wide { width:88%; max-width:1150px; }
+
+  .about { color:var(--body); }
+
+  .about-cols {
+    display:grid;
+    grid-template-columns:1fr 1fr;   /* Amora and food side by side */
+    gap:40px;
+    align-items:start;
+  }
+
+  .about-intro { font-size:1.08em; line-height:1.6; margin:4px 0 6px; }
+
+  /* ---------- section headings (match the year headings) ---------- */
+  .section-head {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:18px 0 10px;
+  }
+
+  .section-label {
+    font-size:1.15em;
+    font-weight:700;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--tan-dark);
+  }
+
+  .section-rule { flex:1; height:1px; background:var(--line); }
+
+  .about p { line-height:1.6; }
+
+  /* ---------- photo galleries ---------- */
+  .gallery {
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 170px));   /* tiles top out at 170px */
+    gap:8px;
+    margin-top:10px;
+  }
+
+
+  .gallery a {
+    display:block;
+    aspect-ratio:1 / 1;
+    overflow:hidden;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#F7F9FB;
+  }
+
+  .gallery img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:transform .25s ease;
+  }
+
+  .gallery a:hover img { transform:scale(1.04); }
+
+  /* food photos get a label underneath */
+  .gallery figure { margin:0; }
+
+  .gallery figcaption {
+    margin-top:4px;
+    font-size:0.88em;
+    font-weight:600;
+    text-align:center;
+    color:var(--ink);
+  }
+
+  @media (max-width:900px) {
+    .about-cols { grid-template-columns:1fr; gap:0; }
+  }
+
+  @media (max-width:600px) {
+    .gallery { gap:6px; }
+  }
+</style>
+</head>
+
+<body>
+<div class="container wide">
+  <center><h2>Eylon Caplan</h2></center>
+  <hr class="nomargin">
+  <nav class="mynavbar">
+    <a href="index.html">HOME</a>
+    <a href="publications.html">PUBLICATIONS</a>
+    <a href="blogs.html">BLOGS</a>
+    <a href="about.html"><span class="focus">ABOUT ME</span></a>
+  </nav>
+  <hr class="nomargin"><br>
+
+  <div class="about">
+    <p class="about-intro">
+      When I'm not doing research, I'm probably cooking something new, at jiu-jitsu,
+      or being loudly informed by my cat that her food bowl is empty.
+    </p>
+
+    <div class="about-cols">
+    <div>
+    <div class="section-head">
+      <span class="section-label">Amora</span>
+      <span class="section-rule"></span>
+    </div>
+    <p>
+      This is Amora, my very vocal cat. She has opinions about everything and isn't shy about sharing them.
+    </p>
+    <div class="gallery">
+      <a href="images/amora/amora-1.jpg"><img src="images/amora/amora-1.jpg" alt="Amora sitting in a cardboard box" loading="lazy"></a>
+      <a href="images/amora/amora-2.jpg"><img src="images/amora/amora-2.jpg" alt="Amora sprawled on a sunflower cat bed" loading="lazy"></a>
+      <a href="images/amora/amora-3.jpg"><img src="images/amora/amora-3.jpg" alt="Amora on a blue couch" loading="lazy"></a>
+      <a href="images/amora/amora-4.jpg"><img src="images/amora/amora-4.jpg" alt="Amora poking her head out of an orange bag" loading="lazy"></a>
+      <a href="images/amora/amora-5.jpg"><img src="images/amora/amora-5.jpg" alt="Amora curled up in a blanket" loading="lazy"></a>
+      <a href="images/amora/amora-6.jpg"><img src="images/amora/amora-6.jpg" alt="Amora stretched upside down on the carpet" loading="lazy"></a>
+      <a href="images/amora/amora-7.jpg"><img src="images/amora/amora-7.jpg" alt="Amora lounging next to a pair of sandals" loading="lazy"></a>
+      <a href="images/amora/amora-8.jpg"><img src="images/amora/amora-8.jpg" alt="Amora napping on top of a microwave" loading="lazy"></a>
+      <a href="images/amora/amora-9.jpg"><img src="images/amora/amora-9.jpg" alt="Amora asleep on a bed" loading="lazy"></a>
+    </div>
+
+    </div>
+
+    <div>
+    <div class="section-head">
+      <span class="section-label">Cooking</span>
+      <span class="section-rule"></span>
+    </div>
+    <p>
+      I love trying new recipes. Here are a few things I've made.
+    </p>
+    <div class="gallery food">
+      <figure><a href="images/food/challah.jpg"><img src="images/food/challah.jpg" alt="Challah" loading="lazy"></a><figcaption>Challah</figcaption></figure>
+      <figure><a href="images/food/chicken-biryani.jpg"><img src="images/food/chicken-biryani.jpg" alt="Chicken biryani" loading="lazy"></a><figcaption>Chicken biryani</figcaption></figure>
+      <figure><a href="images/food/lamb-kebab-and-mixed-veg.jpg"><img src="images/food/lamb-kebab-and-mixed-veg.jpg" alt="Lamb kebab &amp; mixed veg" loading="lazy"></a><figcaption>Lamb kebab &amp; mixed veg</figcaption></figure>
+      <figure><a href="images/food/matbucha.jpg"><img src="images/food/matbucha.jpg" alt="Matbucha" loading="lazy"></a><figcaption>Matbucha</figcaption></figure>
+      <figure><a href="images/food/pork-steaks.jpg"><img src="images/food/pork-steaks.jpg" alt="Pork steaks" loading="lazy"></a><figcaption>Pork steaks</figcaption></figure>
+      <figure><a href="images/food/signature-chicken.jpg"><img src="images/food/signature-chicken.jpg" alt="Signature chicken" loading="lazy"></a><figcaption>Signature chicken</figcaption></figure>
+    </div>
+    </div>
+    </div>
+    <br>
+  </div>
+</div>
+</body>
+</html>

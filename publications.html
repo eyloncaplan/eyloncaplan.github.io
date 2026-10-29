@@ -160,6 +160,26 @@
     border-color:#B9D8FF;
     text-decoration:none;
   }
+  /* ---------- institution logo (top-right of each card) ---------- */
+  .publication { position:relative; padding-right:76px; }
+
+  .pub-org {
+    position:absolute;
+    top:50%;
+    right:16px;
+    transform:translateY(-50%);
+    width:46px;
+    height:auto;
+    opacity:0.85;
+    transition:opacity .15s ease;
+  }
+
+  .publication:hover .pub-org { opacity:1; }
+
+  @media (max-width:600px) {
+    .publication { padding-right:56px; }
+    .pub-org { width:32px; right:12px; }
+  }
 </style>
 </head>
 
@@ -171,8 +191,7 @@
     <a href="index.html">HOME</a>
     <a href="publications.html"><span class="focus">PUBLICATIONS</span></a>
     <a href="blogs.html">BLOGS</a>
-    <a href="contact.html">CONTACT</a>
-    <a href="data/CV.pdf">CV</a>
+    <a href="about.html">ABOUT ME</a>
   </nav>
   <hr class="nomargin"><br>
 
@@ -183,6 +202,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">GRID: Modeling Health Influencer Discourse as Argument Networks for Credibility Assessment</span>
     <span class="paper-author">Nishanth S. Nakshatri, <span class="author-highlight">Eylon Caplan</span>, and Dan Goldwasser</span>
     <div class="venue-line">
@@ -194,6 +214,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/aws-logo.svg" alt="Amazon Web Services" title="Amazon Web Services (AWS)">
     <span class="paper-title">BoundaryMORPH: Budgeted Reranking via Active Set Selection for Diffuse Retrieval</span>
     <span class="paper-author"><span class="author-highlight">Eylon Caplan</span>, Shamik Roy, Shib Sankar Dasgupta, Yingfan Wang, and Rashmi Gangadharaiah</span>
     <div class="venue-line">
@@ -205,6 +226,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">Splits! Flexible Sociocultural Linguistic Investigation at Scale</span>
     <span class="paper-author"><span class="author-highlight">Eylon Caplan</span>, Tania Chakraborty, and Dan Goldwasser</span>
     <div class="venue-line">
@@ -220,6 +242,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">TAIGR: Towards Modeling Influencer Content on Social Media via Structured, Pragmatic Inference</span>
     <span class="paper-author">Nishanth S. Nakshatri, <span class="author-highlight">Eylon Caplan</span>, Rajkumar Pujari, and Dan Goldwasser</span>
     <div class="venue-line">
@@ -232,6 +255,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">Datasets and Methods for Improving the Cultural Capabilities of NLP Systems: A Survey</span>
     <span class="paper-author">Tania Chakraborty*, <span class="author-highlight">Eylon Caplan</span>*, Zhaoqing Wu*, Kevin Cushing, Bruce Qin, Shreya Havaldar, and Dan Goldwasser</span>
     <span class="equal-contrib">*Equal contribution</span>
@@ -251,6 +275,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">VIBE: Can a VLM Read the Room?</span>
     <span class="paper-author">Tania Chakraborty, <span class="author-highlight">Eylon Caplan</span>, and Dan Goldwasser</span>
     <div class="venue-line">
@@ -264,6 +289,7 @@
   </div>
 
   <div class="publication">
+    <img class="pub-org" src="images/purdue-logo.svg" alt="Purdue University" title="Purdue University">
     <span class="paper-title">ConceptCarve: Dynamic Realization of Evidence</span>
     <span class="paper-author"><span class="author-highlight">Eylon Caplan</span> and Dan Goldwasser</span>
     <div class="venue-line">

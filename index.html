@@ -50,6 +50,32 @@
   }
 
   #news-toggle:hover { text-decoration:underline; }
+  /* email / CV buttons under the bio */
+  .contact-buttons { display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 4px; }
+
+  .contact-buttons a {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:6px 16px;
+    font-weight:700;
+    font-size:0.95em;
+    color:#991818;
+    background:#FFFFFF;
+    border:1.5px solid #D5B282;
+    border-radius:999px;
+    text-decoration:none;
+    transition:background .15s ease, border-color .15s ease;
+  }
+
+  .contact-buttons a:hover {
+    background:#FBF5EC;
+    border-color:#A8814A;
+    color:#991818;
+    text-decoration:none;
+  }
+
+  .contact-buttons svg { width:16px; height:16px; }
 </style>
 </head>
 <body>
@@ -80,8 +106,7 @@
       <a href="index.html"><span class="focus">HOME</span></a>
       <a href="publications.html">PUBLICATIONS</a>
       <a href="blogs.html">BLOGS</a>
-      <a href="contact.html">CONTACT</a>
-      <a href="data/CV.pdf">CV</a>
+      <a href="about.html">ABOUT ME</a>
     </nav>
     <hr class="nomargin">
     <br>
@@ -99,6 +124,16 @@
 		<p>
 		Before coming to Purdue, I earned my B.Sc. in Computer Science and Mathematics from the University of Nebraska-Lincoln, where I was first introduced to ML in working with <a href="https://cse-apps.unl.edu/facdb/users/15/details">Stephen Scott</a> and <a href="https://mrhasan-ai.github.io/index.html">M. R. Hasan</a>.
 		</p>
+		<div class="contact-buttons">
+		  <a id="email-btn" href="#" data-user="ecaplan" data-domain="purdue.edu">
+		    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+		    <span>Email</span>
+		  </a>
+		  <a href="data/CV.pdf">
+		    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+		    <span>CV</span>
+		  </a>
+		</div>
       </div>
       <div class="col-md-4">
         <img alt="" src="images/website_image.jpg" height="400">
@@ -167,6 +202,15 @@
         btn.setAttribute('aria-expanded', open);
         btn.innerHTML = open ? 'Show less &#9652;' : 'Show older news &#9662;';
       });
+    })();
+  </script>
+  <script>
+    // assemble the address at runtime so scrapers don't pick it up
+    (function () {
+      var a = document.getElementById('email-btn');
+      var addr = a.getAttribute('data-user') + '@' + a.getAttribute('data-domain');
+      a.href = 'mailto:' + addr;
+      a.title = addr;
     })();
   </script>
 </body>
